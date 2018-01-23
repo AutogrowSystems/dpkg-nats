@@ -1,0 +1,26 @@
+#!/bin/bash
+
+DIR=$1;
+VERSION=$2;
+ARCH=$3;
+
+[[ "$ARCH" == "armhf" ]] && ARCH=arm7
+[[ "$ARCH" == "armel" ]] && ARCH=arm6
+
+tmp=`mktemp -d`;
+fn="gnatsd-v$VERSION-linux-$ARCH";
+
+onexit() {
+  rm -fr $tmp;
+}
+
+echo "Downloading https://github.com/nats-io/gnatsd/releases/download/v$VERSION/$fn.zip";
+curl -SL https://github.com/nats-io/gnatsd/releases/download/v$VERSION/$fn.zip -o  $tmp/$fn.zip;
+[[ "$?" != "0" ]] && echo "Couldn't find a release for $ARCH v$VERSION" && exit 1;
+
+cd $tmp;
+unzip $fn.zip;
+cp $fn/gnatsd $DIR/usr/bin -v
+
+
+exit 0;
